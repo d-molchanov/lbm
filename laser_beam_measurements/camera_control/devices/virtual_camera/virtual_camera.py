@@ -23,8 +23,8 @@ class VirtualCamera(CameraBase):
     type = 'Virtual'
 
     def __init__(self, **kwargs):
-        # kwargs.update({'resolution': [1920, 1080]})
-        kwargs.update({'resolution': [4000, 3000]})
+        kwargs.update({'resolution': [1920, 1080]})
+        # kwargs.update({'resolution': [4000, 3000]})
         super(VirtualCamera, self).__init__(**kwargs)
         self.fps = kwargs.get('fps', 30)
         self.x0 = randint(self._resolution[0] / 4, self._resolution[0] / 2)
