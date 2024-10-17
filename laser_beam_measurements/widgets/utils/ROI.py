@@ -21,8 +21,8 @@ __all__ = ["ROI"]
 
 class ROI(QGraphicsObject):
 
-    RESIZE_ZONE_SIZE = 20
-    MIN_AREA_SIZE = 20
+    RESIZE_ZONE_SIZE = 50
+    MIN_AREA_SIZE = 50
 
     class SelectorZone(Enum):
         NONE = 1
@@ -184,8 +184,15 @@ class ROI(QGraphicsObject):
         # painter.drawRect(QRectF(0, 0, size.width(), size.height()).normalized())
         if self.hovered:
             zones = self._generates_zones()
-            for i in zones:
-                painter.fillRect(zones[i], self.paint_pen.color())
+            colors = [
+                Qt.GlobalColor.red,
+                Qt.GlobalColor.green,
+                Qt.GlobalColor.blue,
+                Qt.GlobalColor.magenta
+            ]
+            for i, c in zip(zones, colors):
+                # painter.fillRect(zones[i], self.paint_pen.color())
+                painter.fillRect(zones[i], c)
                 painter.drawRect(zones[i])
 
     def boundingRect(self) -> QRectF:
@@ -203,7 +210,7 @@ class ROI(QGraphicsObject):
         tr = QTransform()
         tr.rotate(-state[BeamState.ANGLE])
         rect = tr.mapRect(rect)
-        print(state[BeamState.POS])
+        print(f'{state[BeamState.POS] = }')
         rect.moveCenter(state[BeamState.POS])
         return rect
 
@@ -212,6 +219,7 @@ class ROI(QGraphicsObject):
             state = self.state
         size: QSizeF = state[BeamState.SIZE]
         r = QRectF(-size.width() / 2, -size.height() / 2, size.width(), size.height()).normalized()
+        print(f'{r = }')
         if centered:
             r.moveCenter(state[BeamState.POS])
         return r
