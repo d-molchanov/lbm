@@ -193,7 +193,7 @@ class ROI(QGraphicsObject):
             for i, c in zip(zones, colors):
                 # painter.fillRect(zones[i], self.paint_pen.color())
                 painter.fillRect(zones[i], c)
-                painter.drawRect(zones[i])
+                # painter.drawRect(zones[i])
 
     def boundingRect(self) -> QRectF:
         size = self.size()
@@ -258,6 +258,7 @@ class ROI(QGraphicsObject):
 
     def mouseReleaseEvent(self, event):
         self.active_zone = self.SelectorZone.NONE
+        print(f'{self.get_state() = }')
 
     def mouseMoveEvent(self, event):
         if not self.move_enabled:
