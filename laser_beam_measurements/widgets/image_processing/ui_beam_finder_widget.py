@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBo
     QSpacerItem, QSplitter, QVBoxLayout, QWidget)
 
 from ..utils.custom_graphics_view import CustomGraphicsView
+from ..utils.roi_control import ROIControl
 
 class Ui_Form(object):
     def setupUi(self, Form):
@@ -127,9 +128,20 @@ class Ui_Form(object):
 
         self.verticalLayout.addWidget(self.colormap_groub_box)
 
+        self.roi_controls_group_box = QGroupBox(self.groupBox)
+        self.roi_controls_group_box.setObjectName(u'roi_controls_group_box')
+        sizePolicy.setHeightForWidth(self.roi_controls_group_box.sizePolicy().hasHeightForWidth())
+        self.roi_controls_group_box.setSizePolicy(sizePolicy)
+        self.roi_controls_group_box.setMinimumSize(QSize(120, 48))
+        self.roi_controls_group_box.setMaximumSize(QSize(120, 48))
+        self.roi_x_control = ROIControl(self.roi_controls_group_box) 
+
+        self.verticalLayout.addWidget(self.roi_controls_group_box)
+
         self.verticalSpacer = QSpacerItem(20, 210, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout.addItem(self.verticalSpacer)
+
 
 
         self.horizontalLayout.addWidget(self.groupBox)
@@ -163,5 +175,6 @@ class Ui_Form(object):
         self.rotation_auto_check_box.setText(QCoreApplication.translate("Form", u"Auto", None))
         self.angle_label.setText(QCoreApplication.translate("Form", u"Angle:", None))
         self.colormap_groub_box.setTitle(QCoreApplication.translate("Form", u"Colormap", None))
+        self.roi_controls_group_box.setTitle(QCoreApplication.translate("Form", u"ROI Controls", None))
     # retranslateUi
 
