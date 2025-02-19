@@ -30,9 +30,23 @@ class ROIControl(QWidget):
 
         self._label = QLabel(self)
         self._spinBox = QDoubleSpinBox(self)
+        self._spinBox.setKeyboardTracking(False)
+        self._spinBox.setMinimum(0)
+        self._spinBox.setMaximum(10000)
 
         self._outerLayout.addWidget(self._label)
         self._outerLayout.addWidget(self._spinBox)
-        self._spinBox.setKeyboardTracking(False)
         # self._spinBox.setSingleStep(self._slider.get_range()/100.0)
         # self._connect()
+
+    def set_label_text(self, text: str) -> None:
+    	self._label.setText(text)
+
+    @property
+    def label(self) -> QLabel:
+    	return self._label
+
+    @property
+    def spin_box(self) -> QDoubleSpinBox:
+    	return self._spinBox
+    

@@ -30,6 +30,10 @@ class BeamFinderWidget(ImageProcessorViewerBase):
         self.roi = ROI()
         self.roi.setVisible(False)
         self._input_image_scene.addItem(self.roi)
+        self.ui.roi_x_control.set_label_text('X')
+        self.ui.roi_y_control.set_label_text('Y')
+        self.ui.roi_w_control.set_label_text('Width')
+        self.ui.roi_h_control.set_label_text('Height')
         self._connect_signals()
         self._fill_colormap_combobox()
 
