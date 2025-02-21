@@ -96,6 +96,7 @@ class ROI(QGraphicsObject):
             BeamState.SIZE: QSizeF(state[BeamState.SIZE][0], state[BeamState.SIZE][1]),
             BeamState.ANGLE: state.get(BeamState.ANGLE, 0.0)
         }
+        # print(f'{state = }')
         self.set_state(_state, True)
 
     def set_state(self, state: dict, update: bool = True) -> None:

@@ -13,13 +13,15 @@
 from laser_beam_measurements.image_processing.image_processor_viewer_base import ImageProcessorViewerBase
 from laser_beam_measurements.image_processing.beam_finder import BeamFinder, BeamFinderParameters
 from .ui_beam_finder_widget import Ui_Form
-from PySide6.QtCore import Slot, QSettings
+from PySide6.QtCore import Signal, Slot, QSettings, QSignalBlocker
 from laser_beam_measurements.widgets.utils.ROI import ROI
 
 from laser_beam_measurements.utils.colormap import COLORMAPS
 
 
 class BeamFinderWidget(ImageProcessorViewerBase):
+    signal_roi_control_changed = Signal(dict)
+
 
     def __init__(self, parent=None):
         super(BeamFinderWidget, self).__init__(parent, configure_input_scene=True, configure_output_scene=False)
@@ -46,18 +48,49 @@ class BeamFinderWidget(ImageProcessorViewerBase):
         self.ui.noise_value_spin_box.valueChanged.connect(self._slot_set_noise_level)
         self.ui.angle_value_spin_box.valueChanged.connect(self._slot_set_angle_value)
         self.ui.colormap_combo_box.currentTextChanged.connect(self.slot_set_colormap_for_input)
+        self.ui.roi_x_control.spin_box.valueChanged.connect(self.on_roi_control_changed)
+
+    @Slot(float)
+    def on_roi_control_changed(self, value: float) -> None:
+        state = {
+            'pos': (self.ui.roi_x_control.spin_box.value(), self.ui.roi_y_control.spin_box.value()),
+            'size': (self.ui.roi_w_control.spin_box.value(), self.ui.roi_h_control.spin_box.value()), 
+        }
+        with QSignalBlocker(self.roi):
+            self.signal_roi_control_changed.emit(state)
+            # self._image_processor.
+            print('x changed!')
+
+
+    def _update_roi_controls(self, roi_state: dict) -> None:
+        # print(value)
+        with QSignalBlocker(self.ui.roi_x_control):
+            self.ui.roi_x_control.spin_box.setValue(roi_state['pos'].x())
+            # self.ui.roi_x_control.spin_box.setValue(roi_state['pos'].x() - roi_state['size'].width()/2.0)
+        with QSignalBlocker(self.ui.roi_y_control):
+            self.ui.roi_y_control.spin_box.setValue(roi_state['pos'].y())
+            # self.ui.roi_y_control.spin_box.setValue(roi_state['pos'].y() - roi_state['size'].height()/2.0)
+        with QSignalBlocker(self.ui.roi_w_control):
+            self.ui.roi_w_control.spin_box.setValue(roi_state['size'].width())
+        with QSignalBlocker(self.ui.roi_h_control):
+            self.ui.roi_h_control.spin_box.setValue(roi_state['size'].height())
 
     def _connect_processor_signal(self) -> None:
         super(BeamFinderWidget, self)._connect_processor_signal()
         if isinstance(self._image_processor, BeamFinder):
             self._image_processor.signal_beam_state_updated.connect(self.roi.slot_set_state)
             self.roi.signal_region_changed.connect(self._image_processor.slot_set_beam_state)
+            self.roi.signal_region_changed.connect(self._update_roi_controls)
+            self.signal_roi_control_changed.connect(self._image_processor.slot_set_beam_state)
 
     def _disconnect_processor_signal(self) -> None:
         super(BeamFinderWidget, self)._connect_processor_signal()
         if isinstance(self._image_processor, BeamFinder):
             self._image_processor.signal_beam_state_updated.disconnect(self.roi.slot_set_state)
             self.roi.signal_region_changed.disconnect(self._image_processor.slot_set_beam_state)
+            self.roi.signal_region_changed.disconnect(self._update_roi_controls)
+            self.signal_roi_control_changed.disconnect(self._image_processor.slot_set_beam_state)
+
 
     def _change_parameter(self, name: str | BeamFinderParameters, value: object) -> None:
         self.signal_parameter_changed.emit(name, value)
