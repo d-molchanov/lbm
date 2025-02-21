@@ -56,10 +56,15 @@ class BeamFinderWidget(ImageProcessorViewerBase):
             'pos': (self.ui.roi_x_control.spin_box.value(), self.ui.roi_y_control.spin_box.value()),
             'size': (self.ui.roi_w_control.spin_box.value(), self.ui.roi_h_control.spin_box.value()), 
         }
-        with QSignalBlocker(self.roi):
-            self.signal_roi_control_changed.emit(state)
-            # self._image_processor.
-            print('x changed!')
+        self.signal_roi_control_changed.emit(state)
+        # self.roi.set_
+
+        self.roi.update()
+        print(f'{self.roi.move_enabled = }')
+        # with QSignalBlocker(self.roi):
+        #     self.signal_roi_control_changed.emit(state)
+        #     # self._image_processor.
+        #     print('x changed!')
 
 
     def _update_roi_controls(self, roi_state: dict) -> None:
@@ -81,7 +86,8 @@ class BeamFinderWidget(ImageProcessorViewerBase):
             self._image_processor.signal_beam_state_updated.connect(self.roi.slot_set_state)
             self.roi.signal_region_changed.connect(self._image_processor.slot_set_beam_state)
             self.roi.signal_region_changed.connect(self._update_roi_controls)
-            self.signal_roi_control_changed.connect(self._image_processor.slot_set_beam_state)
+            # self.signal_roi_control_changed.connect(self._image_processor.slot_set_beam_state)
+            self.signal_roi_control_changed.connect(self.roi.slot_set_state)
 
     def _disconnect_processor_signal(self) -> None:
         super(BeamFinderWidget, self)._connect_processor_signal()
@@ -89,7 +95,8 @@ class BeamFinderWidget(ImageProcessorViewerBase):
             self._image_processor.signal_beam_state_updated.disconnect(self.roi.slot_set_state)
             self.roi.signal_region_changed.disconnect(self._image_processor.slot_set_beam_state)
             self.roi.signal_region_changed.disconnect(self._update_roi_controls)
-            self.signal_roi_control_changed.disconnect(self._image_processor.slot_set_beam_state)
+            # self.signal_roi_control_changed.disconnect(self._image_processor.slot_set_beam_state)
+            self.signal_roi_control_changed.disconnect(self.roi.slot_set_state)
 
 
     def _change_parameter(self, name: str | BeamFinderParameters, value: object) -> None:

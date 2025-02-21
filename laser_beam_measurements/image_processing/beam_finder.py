@@ -63,6 +63,7 @@ class BeamFinder(ImageProcessorBase):
     def process(self, image: numpy.ndarray) -> bool | None:
         self._processed_image = self.roi_find(image)
         if self._flag_find_auto:
+            print(f'Signal from ImageProcessor of BeamFinder: \n{self._beam_state}')
             self.signal_beam_state_updated.emit(self._beam_state)
         if self._processed_image is not None:
             return True
