@@ -49,6 +49,10 @@ class BeamFinderWidget(ImageProcessorViewerBase):
         self.ui.angle_value_spin_box.valueChanged.connect(self._slot_set_angle_value)
         self.ui.colormap_combo_box.currentTextChanged.connect(self.slot_set_colormap_for_input)
         self.ui.roi_x_control.spin_box.valueChanged.connect(self.on_roi_control_changed)
+        self.ui.roi_y_control.spin_box.valueChanged.connect(self.on_roi_control_changed)
+        self.ui.roi_w_control.spin_box.valueChanged.connect(self.on_roi_control_changed)
+        self.ui.roi_h_control.spin_box.valueChanged.connect(self.on_roi_control_changed)
+
 
     @Slot(float)
     def on_roi_control_changed(self, value: float) -> None:
@@ -56,17 +60,21 @@ class BeamFinderWidget(ImageProcessorViewerBase):
             'pos': (self.ui.roi_x_control.spin_box.value(), self.ui.roi_y_control.spin_box.value()),
             'size': (self.ui.roi_w_control.spin_box.value(), self.ui.roi_h_control.spin_box.value()), 
         }
-        self.signal_roi_control_changed.emit(state)
+        if self.roi.move_enabled: 
+            self.roi.move_enabled = False
+            self.signal_roi_control_changed.emit(state)
+            self.roi.move_enabled = True
+
         # self.roi.set_
 
-        self.roi.update()
-        print(f'{self.roi.move_enabled = }')
+        # self.roi.update()
+        # print(f'{self.roi.move_enabled = }')
         # with QSignalBlocker(self.roi):
         #     self.signal_roi_control_changed.emit(state)
         #     # self._image_processor.
         #     print('x changed!')
 
-
+    @Slot(dict)
     def _update_roi_controls(self, roi_state: dict) -> None:
         # print(value)
         with QSignalBlocker(self.ui.roi_x_control):
