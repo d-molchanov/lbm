@@ -461,6 +461,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="show_motor_controller">
+         <property name="text">
+          <string>Motor</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="Line" name="line_2">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
@@ -506,7 +513,7 @@
      <x>0</x>
      <y>0</y>
      <width>862</width>
-     <height>22</height>
+     <height>33</height>
     </rect>
    </property>
   </widget>

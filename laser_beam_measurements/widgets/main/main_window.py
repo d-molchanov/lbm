@@ -23,6 +23,7 @@ from laser_beam_measurements.widgets.camera_control.camera_property_controller_w
 from laser_beam_measurements.widgets.image_processing.beam_finder_widget import BeamFinderWidget
 from laser_beam_measurements.widgets.image_processing.beam_profiler_widget import BeamProfilerWidget
 from laser_beam_measurements.widgets.image_processing.parameter_logger_widget import ParameterLoggerWidget
+from laser_beam_measurements.widgets.motor_controller.stepper_motor_controller_widget import StepperMotorControllerWidget
 from laser_beam_measurements.main.main_object import MainObject
 from laser_beam_measurements.camera_control.camera_listener import CameraListener
 from laser_beam_measurements.camera_control.camera_listener_base import CameraState
@@ -65,6 +66,7 @@ class MainWindow(QMainWindow):
         self._beam_profiler_widget: Optional[BeamProfilerWidget] = None
         self._property_controller_widget: Optional[CameraPropertyControllerWidget] = None
         self._parameter_logger_widget: Optional[ParameterLoggerWidget] = None
+        self._motor_controller_widget: Optional[StepperMotorControllerWidget] = None
 
         self._flag_save_on_time: bool = False
         self._saving_timer = QTimer()
@@ -108,6 +110,7 @@ class MainWindow(QMainWindow):
         self.ui.show_beam_profiler.clicked.connect(self.show_beam_profiler_widget)
         self.ui.show_settings_button.clicked.connect(self.show_property_controller_widget)
         self.ui.logger_buttton.clicked.connect(self.show_parameter_logger_widget)
+        self.ui.show_motor_controller.clicked.connect(self.show_motor_controller_widget)
 
     @Slot(bool)
     def _slot_camera_state_changed(self, state: CameraState) -> None:
@@ -192,6 +195,27 @@ class MainWindow(QMainWindow):
         return self._create_sub_window(self._beam_profiler_widget, False)
 
     @Slot()
+    def show_motor_controller_widget(self) -> None:
+        sub = self._create_motor_controller_widget_sub_window()
+        self._show_sub_window(sub)
+        # sub = self._create_property_controller_widget_sub_window()
+        # self._show_sub_window(sub)
+
+    def _create_motor_controller_widget_sub_window(self) -> QMdiSubWindow:
+        if self._motor_controller_widget is None:
+            self._motor_controller_widget = StepperMotorControllerWidget(self)
+            self._motor_controller_widget.setWindowIcon(self._icons.start)
+
+        return self._create_sub_window(self._motor_controller_widget.ui.layoutWidget, False)
+        # if self._property_controller_widget is None:
+        #     self._property_controller_widget = CameraPropertyControllerWidget(self)
+        #     self._main_object.set_widget_for_property_controller(self._property_controller_widget)
+        #     self._main_object.set_widget_for_camera_control_status(self._property_controller_widget)
+        #     self._property_controller_widget.setWindowIcon(self._icons.settings)
+        # return self._create_sub_window(self._property_controller_widget, False)
+
+
+    @Slot()
     def show_property_controller_widget(self) -> None:
         sub = self._create_property_controller_widget_sub_window()
         self._show_sub_window(sub)
@@ -204,10 +228,13 @@ class MainWindow(QMainWindow):
             self._property_controller_widget.setWindowIcon(self._icons.settings)
         return self._create_sub_window(self._property_controller_widget, False)
 
+
+    
     @Slot()
     def show_parameter_logger_widget(self) -> None:
         sub = self._create_parameter_logger_widget_sub_window()
         self._show_sub_window(sub)
+
 
     def _create_parameter_logger_widget_sub_window(self) -> QMdiSubWindow:
         if self._parameter_logger_widget is None:

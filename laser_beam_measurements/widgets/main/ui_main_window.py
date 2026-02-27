@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'main_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.0
+## Created by: Qt User Interface Compiler version 6.8.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -181,6 +181,11 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.logger_buttton)
 
+        self.show_motor_controller = QPushButton(self.buttonsGroupBox)
+        self.show_motor_controller.setObjectName(u"show_motor_controller")
+
+        self.horizontalLayout.addWidget(self.show_motor_controller)
+
         self.line_2 = QFrame(self.buttonsGroupBox)
         self.line_2.setObjectName(u"line_2")
         sizePolicy2.setHeightForWidth(self.line_2.sizePolicy().hasHeightForWidth())
@@ -206,7 +211,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 862, 22))
+        self.menubar.setGeometry(QRect(0, 0, 862, 33))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -271,5 +276,6 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.save_processed_image_button.setText("")
         self.logger_buttton.setText("")
+        self.show_motor_controller.setText(QCoreApplication.translate("MainWindow", u"Motor", None))
     # retranslateUi
 
