@@ -16,6 +16,8 @@ from laser_beam_measurements.camera_control.camera_selector import CameraSelecto
 from laser_beam_measurements.image_processing.beam_analyzer import BeamAnalyzer
 from laser_beam_measurements.image_processing.image_processor_sink import ImageProcessorSink
 from laser_beam_measurements.image_processing.parameter_logger import ParameterLogger
+from laser_beam_measurements.widgets.motor_controller.stm32_communication import STM32Communication
+
 
 
 class MainObject(QObject):
@@ -33,7 +35,8 @@ class MainObject(QObject):
 
         self._logger = ParameterLogger()
         self._beam_analyzer.beam_profiler.parameter_logger = self._logger
-
+        self._stm32_communication = STM32Communication()
+        self._beam_analyzer.beam_profiler.stm32_communication = self._stm32_communication
         self._settings_name = "settings.conf"
 
         self._load_settings()
@@ -86,6 +89,12 @@ class MainObject(QObject):
             widget.set_logger(self._logger)
             return True
         return False
+    
+    def set_widget_for_motor_controller(self, widget: QWidget) -> bool:
+        if hasattr(widget, 'stm32_communication'):
+            widget.stm32_communication = self._stm32_communication
+            return True
+        return False 
 
     def closeEvent(self, event) -> None:
         self._camera_grabber.run_status_changed(False)

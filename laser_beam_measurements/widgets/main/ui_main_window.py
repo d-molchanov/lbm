@@ -183,6 +183,7 @@ class Ui_MainWindow(object):
 
         self.show_motor_controller = QPushButton(self.buttonsGroupBox)
         self.show_motor_controller.setObjectName(u"show_motor_controller")
+        self.show_motor_controller.setMaximumSize(QSize(30, 30))
 
         self.horizontalLayout.addWidget(self.show_motor_controller)
 
@@ -276,6 +277,6 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.save_processed_image_button.setText("")
         self.logger_buttton.setText("")
-        self.show_motor_controller.setText(QCoreApplication.translate("MainWindow", u"Motor", None))
+        self.show_motor_controller.setText("")
     # retranslateUi
 

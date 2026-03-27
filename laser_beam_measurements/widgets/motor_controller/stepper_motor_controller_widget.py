@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from typing import Optional
 from serial import Serial
 from serial.tools.list_ports import comports
 
@@ -39,6 +40,7 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
         super(StepperMotorControllerWidget, self).__init__(parent)
         self.ui = Ui_Form()
         self.ui.setupUi(self)
+        self.setWindowTitle('Motor')
         self._icons = Icons()
         self._set_icons()
         # self.setupUi(self)
@@ -87,7 +89,17 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
             self.onStepDividerChanged
         )
         self.logs_updated.emit('hello!')
+
+    @property
+    def stm32_communication(self) -> Optional[STM32Communication]:
+        return self._communication
+    
+    @stm32_communication.setter
+    def stm32_communication(self, communication: STM32Communication) -> None:
+        self._communication = communication
         self._set_signals()
+        print(f'Communication from stepper motor controller widget was set.')
+
 
     def _set_icons(self):
         self.ui.pushButtonCheckState.setIcon(self._icons.check_state)
@@ -130,6 +142,8 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
         self._communication.connection_is_active.connect(
             self.connection_is_active
         )
+        self.measuring_requested.connect(self._communication.slot_measure_beams)
+        print('Signals were set.')
 
     @Slot()
     def on_measuring_requested(self):
@@ -186,6 +200,55 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
             }
             self.update_logs(f'{result = }')
             self.movement_request_created.emit(result)
+        elif self.ui.tabWidget.currentIndex() == 2:
+            # self.update_logs('Hello!')
+            text_program = self._parse_program(
+                self.ui.textEditProgram.toPlainText()
+            )
+            self.update_logs(f'{text_program = }')
+            for d in text_program:
+                coordinate = float(d['coord'])
+                units = d['units']
+                command = d['command']
+                self.update_logs(
+                    f'Move to {coordinate}'
+                    f' {units}'
+                )
+                if coordinate >= 0:
+                    direction = 'Clockwise'
+                else:
+                    direction = 'Counterclockwise'
+                    coordinate = abs(coordinate)
+                factor_dict = {
+                    'um': 1.0,
+                    'mm': 1e3,
+                    'cm': 1e4
+                }
+                factor = factor_dict.get(units, None)
+                if factor:
+                    scale = self.ui.doubleSpinBoxScale.value()
+                    steps_amount = round(coordinate * factor / scale)
+                else:
+                    steps_amount = None
+                result = {
+                    'request_type': 'Movement',
+                    'step_type': '1:16',
+                    'steps_amount': steps_amount,
+                    'direction': direction,
+                    'velocity': self.ui.spinBoxVelocity.value()
+                }
+                self.update_logs(f'{result = }')
+                self.movement_request_created.emit(result)
+                if command == '+':
+                    self.measuring_requested.emit()
+
+    def _parse_program(self, program_text: str) -> list:
+        result = []
+        lines = program_text.split('\n')
+        for line in lines:
+            x, units, c = line.split()
+            result.append({'coord': x, 'units': units, 'command': c})
+        return result
 
 
     def check_available_comports(self) -> list:
@@ -218,6 +281,7 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
         self.ui.comboBoxCOMPorts.setEnabled(not value)
         self.ui.comboBoxBaudRate.setEnabled(not value)
         self.ui.pushButtonRefresh.setEnabled(not value)
+        print(f'Connection status from widget: {value}')
         # self.pushButtonRefresh.setDisabled(value)
 
     @Slot()

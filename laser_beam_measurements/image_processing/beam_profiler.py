@@ -19,6 +19,8 @@ from .utils.denoising import find_noise_level_from_histogram, threshold
 from .utils import beam_width as bm
 from .utils.sub_image import get_cross_section
 from .parameter_logger import ParameterLogger
+from laser_beam_measurements.widgets.motor_controller.stm32_communication import STM32Communication
+
 from typing import Optional
 
 
@@ -81,6 +83,7 @@ class BeamProfiler(ImageProcessorBase):
         self._beam_parameters: dict[str, dict[str, tuple[float, float] | float]] = dict()
         self._pixel_size: float = 1.0
         self._parameter_logger: Optional[ParameterLogger] = None
+        self._stm32_communication: Optional[STM32Communication] = None
 
     @property
     def parameter_logger(self) -> Optional[ParameterLogger]:
@@ -94,6 +97,18 @@ class BeamProfiler(ImageProcessorBase):
         self._parameter_logger.setParent(self)
         self.signal_beam_parameters_updated.connect(self._parameter_logger.slot_set_data)
         self.update_available_parameters()
+
+    @property
+    def stm32_communication(self) -> Optional[STM32Communication]:
+        return self._stm32_communication
+    
+    @stm32_communication.setter
+    def stm32_communication(self, communication: STM32Communication) -> None:
+        self._stm32_communication = communication
+        self._stm32_communication.setParent(self)
+        self.signal_beam_parameters_updated.connect(self._stm32_communication.slot_current_data)
+        
+        print(f'Communication from beam profiler was set.')
 
     def update_available_parameters(self) -> None:
         if self._parameter_logger is None:

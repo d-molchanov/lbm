@@ -46,6 +46,7 @@ class Icons:
     beam_profiler = Icon("beam_profiler.svg")
     main = Icon("main.svg")
     clock = Icon("clock.svg")
+    motor = Icon("motor_widget.svg")
 
 
 class MainWindow(QMainWindow):
@@ -90,6 +91,7 @@ class MainWindow(QMainWindow):
         self.ui.save_processed_image_button.setIcon(self._icons.save)
         self.ui.show_beam_finder.setIcon(self._icons.beam_find)
         self.ui.show_beam_profiler.setIcon(self._icons.beam_profiler)
+        self.ui.show_motor_controller.setIcon(self._icons.motor)
         self.ui.beam_analyzing_section_label.setPixmap(
             self._icons.beam_analyze.pixmap(25, 25, QIcon.Mode.Normal, QIcon.State.On))
         self.ui.logger_buttton.setIcon(self._icons.clock)
@@ -204,7 +206,10 @@ class MainWindow(QMainWindow):
     def _create_motor_controller_widget_sub_window(self) -> QMdiSubWindow:
         if self._motor_controller_widget is None:
             self._motor_controller_widget = StepperMotorControllerWidget(self)
-            self._motor_controller_widget.setWindowIcon(self._icons.start)
+            # self._motor_controller_widget.setWindowIcon(self._icons.motor)
+            self._motor_controller_widget.setWindowIcon(self._icons.save)
+            self._main_object.set_widget_for_motor_controller(self._motor_controller_widget)
+            # print(f'{self._motor_controller_widget.windowIcon() = }')
 
         return self._create_sub_window(self._motor_controller_widget.ui.layoutWidget, False)
         # if self._property_controller_widget is None:
@@ -429,6 +434,11 @@ class MainWindow(QMainWindow):
         beam_profiler_action.setIcon(self._icons.beam_profiler)
         beam_profiler_action.triggered.connect(self.show_beam_profiler_widget)
         image_processing.addAction(beam_profiler_action)
+
+        motor_controller_action = QAction("Motor Controller", self)
+        motor_controller_action.setIcon(self._icons.motor)
+        motor_controller_action.triggered.connect(self.show_motor_controller_widget)
+        image_processing.addAction(motor_controller_action)
 
         parameter_logger_action = QAction("Parameters Logger", self)
         parameter_logger_action.setIcon(self._icons.clock)

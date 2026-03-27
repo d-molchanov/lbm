@@ -38,6 +38,7 @@ class StmRequest(StrEnum):
     # )
 
 class STM32Communication(MCUCommunicationBase):
+    measure_beams = Signal()
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
@@ -45,6 +46,7 @@ class STM32Communication(MCUCommunicationBase):
         self.port_name = None
         self.baudrate = None
         self.timer = None
+        self._current_data = None
     
     @Slot(str, int)
     def start_communication(
@@ -267,6 +269,15 @@ class STM32Communication(MCUCommunicationBase):
             f'Request to STM32: `{StmRequest.SETZERO}`', Level.INFO
         )
         self.write_data(StmRequest.SETZERO.encode('utf-8'))
+
+    @Slot()
+    def slot_measure_beams(self) -> None:
+        self.measure_beams.emit()
+        print(self._current_data)
+
+    @Slot(dict)
+    def slot_current_data(self, data: dict) -> None:
+        self._current_data = data
 
 def main() -> None:
     communication = STM32Communication()
