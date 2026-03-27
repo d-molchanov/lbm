@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'stepper_motor_controller_widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.0
+## Created by: Qt User Interface Compiler version 6.10.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -181,7 +181,7 @@ class Ui_Form(object):
         self.tab.setObjectName(u"tab")
         self.layoutWidget1 = QWidget(self.tab)
         self.layoutWidget1.setObjectName(u"layoutWidget1")
-        self.layoutWidget1.setGeometry(QRect(10, 10, 196, 134))
+        self.layoutWidget1.setGeometry(QRect(10, 10, 207, 134))
         self.gridLayout = QGridLayout(self.layoutWidget1)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
@@ -248,7 +248,7 @@ class Ui_Form(object):
         self.tab_2.setObjectName(u"tab_2")
         self.layoutWidget2 = QWidget(self.tab_2)
         self.layoutWidget2.setObjectName(u"layoutWidget2")
-        self.layoutWidget2.setGeometry(QRect(10, 10, 208, 86))
+        self.layoutWidget2.setGeometry(QRect(10, 10, 223, 86))
         self.gridLayout_2 = QGridLayout(self.layoutWidget2)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -293,7 +293,7 @@ class Ui_Form(object):
         self.doubleSpinBoxScale = QDoubleSpinBox(self.layoutWidget2)
         self.doubleSpinBoxScale.setObjectName(u"doubleSpinBoxScale")
         self.doubleSpinBoxScale.setMaximum(10000.000000000000000)
-        self.doubleSpinBoxScale.setValue(7.000000000000000)
+        self.doubleSpinBoxScale.setValue(5.000000000000000)
 
         self.gridLayout_2.addWidget(self.doubleSpinBoxScale, 1, 1, 1, 1)
 
@@ -359,7 +359,7 @@ class Ui_Form(object):
 
         self.retranslateUi(Form)
 
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(Form)
