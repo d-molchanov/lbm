@@ -89,8 +89,11 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
         self.ui.comboBoxStep.currentTextChanged.connect(
             self.onStepDividerChanged
         )
-        self.ui.textEditProgram.setPlainText('10 mm +\n-20 mm +\n5 mm')
-        self.logs_updated.emit('hello!')
+        self.ui.textEditProgram.setPlainText('10 mm +\n-20 mm +\n5 mm -\n5 mm +')
+        # self.logs_updated.emit('hello!')
+        self._programs = []
+        self._program_index = 0
+        self._m2 = []
 
     @property
     def stm32_communication(self) -> Optional[STM32Communication]:
@@ -143,6 +146,9 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
         self._communication.logs_updated.connect(self.update_logs)
         self._communication.connection_is_active.connect(
             self.connection_is_active
+        )
+        self._communication.answer_sent.connect(
+            self.slot_move_to_next_point
         )
         self.measuring_requested.connect(self._communication.slot_measure_beams)
         print('Signals were set.')
@@ -203,24 +209,31 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
             self.update_logs(f'{result = }')
             self.movement_request_created.emit(result)
         elif self.ui.tabWidget.currentIndex() == 2:
+            self._programs = []
             # self.update_logs('Hello!')
-            text_program = self._parse_program(
+            self._programs = self._parse_program(
                 self.ui.textEditProgram.toPlainText()
             )
-            self.update_logs(f'{text_program = }')
-            for d in text_program:
-                coordinate = float(d['coordinate'])
-                units = d['units']
-                command = d['command']
-                self.update_logs(
-                    f'Move to {coordinate}'
-                    f' {units}'
-                )
-                request = self._create_movement_request(d)
-                self.update_logs(f'{request = }')
+            self.update_logs(f'{self._programs = }')
+            if self._programs:
+                request = self._create_movement_request(self._programs[0])
                 self.movement_request_created.emit(request)
-                if command == '+':
-                    self.measuring_requested.emit()
+                self._program_index = 1
+            # for d in text_program:
+            #     self._programs.append(d)
+                # coordinate = float(d['coordinate'])
+                # units = d['units']
+                # command = d['command']
+                # self.update_logs(
+                #     f'Move to {coordinate}'
+                #     f' {units}'
+                # )
+                # request = self._create_movement_request(d)
+                # self.update_logs(f'{request = }')
+                # self._programs.append(request)
+                # self.movement_request_created.emit(request)
+                # if command == '+':
+                    # self.measuring_requested.emit()
 
     def _create_movement_request(self, parameters: dict) -> dict:
         coordinate = parameters['coordinate']
@@ -258,11 +271,32 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
             x, units, c = line.split()
             result.append(
                 {
-                    'coordinate': x,
+                    'coordinate': float(x),
                     'units': units,
                     'command': c})
         return result
 
+    @Slot(str)
+    def slot_move_to_next_point(self, answer):
+        if self._program_index > (len(self._programs) - 1):
+            self._program_index = 0
+            # self._programs = []
+            # return
+        print(answer[-7:-1])
+        request = self._create_movement_request(
+            self._programs[self._program_index]
+        )
+        data = self._communication._current_data
+        self._m2.append(
+            {
+                'coordinate': self._programs[self._program_index]['coordinate'],
+                'data': data
+            }
+        )
+        print(f'{data = }')
+        self.measuring_requested.emit()
+        self.movement_request_created.emit(request)
+        self._program_index += 1 
 
     def check_available_comports(self) -> list:
         return [

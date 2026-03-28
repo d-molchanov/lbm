@@ -1,6 +1,6 @@
 # Current MCU: STM32F103C8T6
-# from enum import StrEnum
-from strenum import StrEnum
+from enum import StrEnum
+# from strenum import StrEnum
 from serial import Serial
 from serial.serialutil import SerialException
 from serial.tools.list_ports import comports
@@ -126,6 +126,7 @@ class STM32Communication(MCUCommunicationBase):
                 f'Answer has been received: `{answer}`',
                 Level.INFO
             )
+            self.answer_sent.emit(answer)
         except SerialException as e:
             self.update_logs(
                 f'Reading error at `{self.port_name}`: {e}',
@@ -279,6 +280,10 @@ class STM32Communication(MCUCommunicationBase):
     @Slot(dict)
     def slot_current_data(self, data: dict) -> None:
         self._current_data = data
+
+
+        
+
 
 def main() -> None:
     communication = STM32Communication()
