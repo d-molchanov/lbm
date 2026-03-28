@@ -5,6 +5,7 @@ from PySide6.QtCore import QObject, Signal, QDateTime, QThread
 class MCUCommunicationBase(QObject): 
     connection_is_active = Signal(bool)
     logs_updated = Signal(str)
+    answer_sent = Signal(str)
 
     def __init__(self, parent = None, **kwargs) -> None:
         super().__init__(parent)

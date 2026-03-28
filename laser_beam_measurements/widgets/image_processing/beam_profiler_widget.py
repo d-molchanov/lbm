@@ -172,7 +172,7 @@ class BeamProfilerWidget(ImageProcessorViewerBase):
                            yy: numpy.ndarray, curve_y: numpy.ndarray) -> None:
         self.curve_line_x.setData(x=xx, y=curve_x)
         self.curve_line_y.setData(x=yy, y=curve_y)
-
+    
     def configure_table_widget(self, parameters_dict: dict[str, dict[str, object]]) -> None:
         table_widget = self.ui.tableWidget
 
