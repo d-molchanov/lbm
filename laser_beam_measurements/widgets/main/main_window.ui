@@ -462,8 +462,14 @@
        </item>
        <item>
         <widget class="QPushButton" name="show_motor_controller">
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
          <property name="text">
-          <string>Motor</string>
+          <string/>
          </property>
         </widget>
        </item>
