@@ -83,11 +83,13 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
         self.ui.pushButtonStartMotor.clicked.connect(self.create_request)
         units_values = ['um', 'mm', 'cm']
         self.ui.comboBoxMovementUnits.addItems(units_values)
+        self.ui.comboBoxMovementUnits.setCurrentIndex(1)
         velocity_values = ['um/s', 'mm/s', 'cm/s', 'm/s']
         self.ui.comboBoxVelocityUnits.addItems(velocity_values)
         self.ui.comboBoxStep.currentTextChanged.connect(
             self.onStepDividerChanged
         )
+        self.ui.textEditProgram.setPlainText('10 mm +\n-20 mm +\n5 mm')
         self.logs_updated.emit('hello!')
 
     @property
@@ -207,47 +209,58 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
             )
             self.update_logs(f'{text_program = }')
             for d in text_program:
-                coordinate = float(d['coord'])
+                coordinate = float(d['coordinate'])
                 units = d['units']
                 command = d['command']
                 self.update_logs(
                     f'Move to {coordinate}'
                     f' {units}'
                 )
-                if coordinate >= 0:
-                    direction = 'Clockwise'
-                else:
-                    direction = 'Counterclockwise'
-                    coordinate = abs(coordinate)
-                factor_dict = {
-                    'um': 1.0,
-                    'mm': 1e3,
-                    'cm': 1e4
-                }
-                factor = factor_dict.get(units, None)
-                if factor:
-                    scale = self.ui.doubleSpinBoxScale.value()
-                    steps_amount = round(coordinate * factor / scale)
-                else:
-                    steps_amount = None
-                result = {
-                    'request_type': 'Movement',
-                    'step_type': '1:16',
-                    'steps_amount': steps_amount,
-                    'direction': direction,
-                    'velocity': self.ui.spinBoxVelocity.value()
-                }
-                self.update_logs(f'{result = }')
-                self.movement_request_created.emit(result)
+                request = self._create_movement_request(d)
+                self.update_logs(f'{request = }')
+                self.movement_request_created.emit(request)
                 if command == '+':
                     self.measuring_requested.emit()
+
+    def _create_movement_request(self, parameters: dict) -> dict:
+        coordinate = parameters['coordinate']
+        units = parameters['units']
+        if coordinate >= 0:
+            direction = 'Clockwise'
+        else:
+            direction = 'Counterclockwise'
+            coordinate = abs(coordinate)
+        factor_dict = {
+            'um': 1.0,
+            'mm': 1e3,
+            'cm': 1e4
+        }
+        factor = factor_dict.get(units, None)
+        if factor:
+            scale = self.ui.doubleSpinBoxScale.value()
+            steps_amount = round(coordinate * factor / scale)
+        else:
+            steps_amount = None
+        velocity = self.ui.spinBoxVelocity.value()
+        result = {
+            'request_type': 'Movement',
+            'step_type': '1:16',
+            'steps_amount': steps_amount,
+            'direction': direction,
+            'velocity': velocity
+        }
+        return result
 
     def _parse_program(self, program_text: str) -> list:
         result = []
         lines = program_text.split('\n')
         for line in lines:
             x, units, c = line.split()
-            result.append({'coord': x, 'units': units, 'command': c})
+            result.append(
+                {
+                    'coordinate': x,
+                    'units': units,
+                    'command': c})
         return result
 
 
