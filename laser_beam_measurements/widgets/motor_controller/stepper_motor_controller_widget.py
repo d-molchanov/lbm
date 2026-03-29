@@ -4,7 +4,7 @@ from typing import Optional
 from serial import Serial
 from serial.tools.list_ports import comports
 
-from PySide6.QtCore import Signal, Slot, QTime, QDateTime
+from PySide6.QtCore import Signal, Slot, QTime, QDateTime, QTimer
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget
 from PySide6.QtGui import QIcon
 from .ui_stepper_motor_controller_widget import Ui_Form
@@ -94,6 +94,25 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
         self._programs = []
         self._program_index = 0
         self._m2 = []
+        self.ui.pushButtonMeasure.setEnabled(True)
+        self._timer = QTimer()
+        self._timer.setInterval(500)
+        self._timer.timeout.connect(self.slot_measure_beam)
+        self._measured_amount = 0
+        self._measured_amount_max = 10
+        self._measured_pars = {
+            'global_x': [],
+            'global_y': [],
+            'local_x': [],
+            'local_y': [],
+            'level135_x': [],
+            'level135_y': [],
+            '4sigma_x': [],
+            '4sigma_y': [],
+            'gauss_x': [],
+            'gauss_y': [],
+            'power86': []
+        }
 
     @property
     def stm32_communication(self) -> Optional[STM32Communication]:
@@ -156,6 +175,100 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
     @Slot()
     def on_measuring_requested(self):
         self.measuring_requested.emit()
+        self._communication.adjust_exposure.emit()
+        # self._m2.append(self._communication._current_data)
+        self._measured_amount = 0
+        self._timer.start()
+        print('')
+        print(*self._m2, sep='\n')
+
+    @Slot()
+    def slot_measure_beam(self) -> None:
+        if self._measured_amount > self._measured_amount_max:
+            self._timer.stop()
+            self._measured_amount = 0
+            result = {}
+            for key, value in self._measured_pars.items():
+                result[key] = self._calculate_average(value)
+            print(
+                '\t'.join(
+                    [
+                        f'{key}: {value:.2f}' for key, value in result.items()
+                    ]
+                )
+            )
+            result['number'] = self._program_index
+            # result['coordinate'] = self._programs[self._program_index]['coordinate']
+            self._m2.append(result)
+            print(self._m2)
+
+            return
+        bp = self._parse_beam_parameters(self._communication._current_data)
+        self._measured_pars['global_x'].append(bp['global_x'])
+        self._measured_pars['global_y'].append(bp['global_y'])
+        self._measured_pars['local_x'].append(bp['local_x'])
+        self._measured_pars['local_y'].append(bp['local_y'])
+        self._measured_pars['level135_x'].append(bp['level135_x'])
+        self._measured_pars['level135_y'].append(bp['level135_y'])
+        self._measured_pars['4sigma_x'].append(bp['4sigma_x'])
+        self._measured_pars['4sigma_y'].append(bp['4sigma_y'])
+        self._measured_pars['gauss_x'].append(bp['gauss_x'])
+        self._measured_pars['gauss_y'].append(bp['gauss_y'])
+        self._measured_pars['power86'].append(bp['power86'])
+
+        self._measured_amount += 1
+
+    def _calculate_average(self, data: list) -> Optional[float]:
+        filtered_data = [d for d in data if d]
+        if filtered_data:
+            return sum(filtered_data) / len(filtered_data)
+        return None
+    
+    def _parse_beam_parameters(self, parameters: dict) -> Optional[dict]:
+        if not parameters:
+            return
+        result = {
+            'global_x': None,
+            'global_y': None,
+            'local_x': None,
+            'local_y': None,
+            'level135_x': None,
+            'level135_y': None,
+            '4sigma_x': None,
+            '4sigma_y': None,
+            'gauss_x': None,
+            'gauss_y': None,
+            'power86': None
+        }
+        pos = parameters.get('Beam Position And Orientation', None)
+        if pos:
+            global_pos = pos.get('Global position', None)
+            # print(f'{global_pos = }')
+            if global_pos and isinstance(global_pos, (list, tuple)) and len(global_pos) > 1:
+                result['global_x'] = global_pos[0]
+                result['global_y'] = global_pos[1]
+            local_pos = pos.get('Local position', None)
+            # print(f'{local_pos = }')
+            if local_pos and isinstance(local_pos, (list, tuple)) and len(local_pos) > 1:
+                result['local_x'] = local_pos[0]
+                result['local_y'] = local_pos[1]
+        beam_width = parameters.get('Beam Width', None)
+        # print(f'{beam_width = }')
+        if beam_width:
+            level_135 = beam_width.get('13.5% level', None)
+            if level_135 and isinstance(level_135, (list, tuple)) and len(level_135) > 1:
+                result['level135_x'] = level_135[0]
+                result['level135_y'] = level_135[1]
+            _4sigma = beam_width.get('4 Sigma', None)
+            if _4sigma and isinstance(_4sigma, (list, tuple)) and len(_4sigma) > 1:
+                result['4sigma_x'] = _4sigma[0]
+                result['4sigma_y'] = _4sigma[1]
+            gauss = beam_width.get('Gauss approximation', None)
+            if gauss and isinstance(gauss, (list, tuple)) and len(gauss) > 1:
+                result['gauss_x'] = gauss[0]
+                result['gauss_y'] = gauss[1]
+            result['power86'] = beam_width.get('86% Power', None)
+        return result
 
     @Slot(str)
     def onStepDividerChanged(self, step_divider):

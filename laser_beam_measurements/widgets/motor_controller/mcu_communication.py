@@ -5,6 +5,7 @@ from serial.serialutil import SerialException
 from PySide6.QtCore import QThread, Signal, QObject, Slot, QTimer, QCoreApplication, QDateTime
 import time
 import enum
+from strenum import StrEnum
 
 class MCURequests(enum.Enum):
     # CHECKSTATE = '!QP%'.encode('utf-8')
@@ -14,7 +15,7 @@ class MCURequests(enum.Enum):
     SETZERO = b'!ZE%'
     STOP = b'!ST%'
 
-class Status(enum.StrEnum):
+class Status(StrEnum):
     INFO = 'INFO'
     ERROR = 'ERROR'
 

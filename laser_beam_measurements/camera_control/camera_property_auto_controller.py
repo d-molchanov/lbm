@@ -147,10 +147,12 @@ class CameraPropertyAutoController(QObject):
                 if not result:
                     check_result = ControllerStatus.STATUS_RUNNING
         self.signal_check_result.emit(check_result)
+        # print(check_result)
 
     def _check_counter(self):
         if self._counter > self._max_counter:
             self._counter = 0
+            # print('Exposure is correct!')
             return True
         else:
             self._counter += 1

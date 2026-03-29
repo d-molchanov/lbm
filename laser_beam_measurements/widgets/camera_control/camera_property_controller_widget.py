@@ -19,6 +19,7 @@ from laser_beam_measurements.camera_control.camera_base import CameraBase
 from laser_beam_measurements.camera_control.camera_property_base import CameraPropertyBase
 from laser_beam_measurements.icons import Icon
 
+
 from .ui_camera_property_controller_widget import Ui_Form
 
 
