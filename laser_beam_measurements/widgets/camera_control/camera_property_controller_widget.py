@@ -121,7 +121,7 @@ class CameraPropertyControllerWidget(QWidget):
                 prop = controller.get_property("exposure")
                 self.ui.exposure_slider.setMinimum(prop.min)
                 self.ui.exposure_slider.setMaximum(prop.max)
-                self.ui.exposure_slider.setValue(prop.value)
+                # self.ui.exposure_slider.setValue(prop.value)
             else:
                 self.ui.exposure_slider.setDisabled(True)
             self.blockSignals(False)
@@ -146,6 +146,7 @@ class CameraPropertyControllerWidget(QWidget):
             self.ui.gain_slider.setValue(value)
         elif name == "exposure":
             self.ui.exposure_slider.setValue(value)
+            self.ui.exposure_slider._spinBox.setValue(round(value))
 
     def _connect_signals(self) -> None:
         self.ui.exposure_slider.value_changed.connect(self._change_exposure_value)
