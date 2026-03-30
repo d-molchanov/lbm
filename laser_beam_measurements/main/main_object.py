@@ -38,6 +38,7 @@ class MainObject(QObject):
         self._stm32_communication = STM32Communication()
         self._beam_analyzer.beam_profiler.stm32_communication = self._stm32_communication
         self._stm32_communication.adjust_exposure.connect(self._camera_grabber.auto_controller.slot_control_change)
+        self._camera_grabber.auto_controller.signal_exposure_is_correct.connect(self._stm32_communication.slot_exposure_is_correct)
         self._settings_name = "settings.conf"
 
         self._load_settings()

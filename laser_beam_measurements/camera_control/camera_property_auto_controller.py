@@ -75,6 +75,7 @@ class NumpyImageMaxPixelChecker(NumpyImageBaseChecker):
 class CameraPropertyAutoController(QObject):
 
     signal_check_result = Signal(ControllerStatus)
+    signal_exposure_is_correct = Signal()
 
     def __init__(self, parent=None, controller: CameraPropertyController | None=None):
         super(CameraPropertyAutoController, self).__init__(parent)
@@ -85,7 +86,7 @@ class CameraPropertyAutoController(QObject):
         self._flag_control_always: bool = False
         self._flag_bad_signal: bool = False
         self._property_name: str = "exposure"
-        self._checker.range = (190, 240)
+        self._checker.range = (220, 250)
         self._current_bounds: list = list()
         self._step = 1e-1
         self._prop_range: tuple = (0.0, 1.0)
@@ -152,7 +153,8 @@ class CameraPropertyAutoController(QObject):
     def _check_counter(self):
         if self._counter > self._max_counter:
             self._counter = 0
-            # print('Exposure is correct!')
+            print('Exposure is correct!')
+            self.signal_exposure_is_correct.emit()
             return True
         else:
             self._counter += 1
@@ -210,8 +212,10 @@ class CameraPropertyAutoController(QObject):
             else:
                 self._current_bounds[1] = value
         # self._counter = 0
-
+        
         if self._current_bounds[1] - self._current_bounds[0] <= 1:
+            self.signal_exposure_is_correct.emit()
+            print(f'{self._current_bounds = }')
             return True
         self._controller.set_property_value(self._property_name, sum(self._current_bounds)/2)
  

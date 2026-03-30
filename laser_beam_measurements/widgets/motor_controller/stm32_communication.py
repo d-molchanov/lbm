@@ -276,14 +276,17 @@ class STM32Communication(MCUCommunicationBase):
     @Slot()
     def slot_measure_beams(self) -> None:
         self.measure_beams.emit()
-        print(self._current_data)
+        # print(self._current_data)
 
     @Slot(dict)
     def slot_current_data(self, data: dict) -> None:
         self._current_data = data
 
 
-        
+    @Slot()
+    def slot_exposure_is_correct(self) -> None:
+        print('Exposure is correct from stm32')
+        self.measure_beams.emit()
 
 
 def main() -> None:

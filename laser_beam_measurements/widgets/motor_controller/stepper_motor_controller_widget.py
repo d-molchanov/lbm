@@ -89,7 +89,9 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
         self.ui.comboBoxStep.currentTextChanged.connect(
             self.onStepDividerChanged
         )
-        self.ui.textEditProgram.setPlainText('10 mm +\n-20 mm +\n5 mm -\n5 mm +')
+        # self.ui.textEditProgram.setPlainText('10 mm +\n-20 mm +\n5 mm -\n5 mm +')
+        # self.ui.textEditProgram.setPlainText('10 mm +\n10 mm +\n10 mm +\n10 mm +\n10 mm +\n-50 mm +')
+        self.ui.textEditProgram.setPlainText('10 mm +\n-10 mm +')
         # self.logs_updated.emit('hello!')
         self._programs = []
         self._program_index = 0
@@ -167,23 +169,26 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
             self.connection_is_active
         )
         self._communication.answer_sent.connect(
-            self.slot_move_to_next_point
+            self.slot_movement_finished
         )
-        self.measuring_requested.connect(self._communication.slot_measure_beams)
-        print('Signals were set.')
+        # self.measuring_requested.connect(self._communication.slot_measure_beams)
+        self._communication.measure_beams.connect(self.on_measuring_requested)
+        # print('Signals were set.')
 
     @Slot()
     def on_measuring_requested(self):
-        self.measuring_requested.emit()
-        self._communication.adjust_exposure.emit()
+        # self.measuring_requested.emit()
+        # self._communication.adjust_exposure.emit()
         # self._m2.append(self._communication._current_data)
         self._measured_amount = 0
         self._timer.start()
-        print('')
-        print(*self._m2, sep='\n')
+        # print('')
+        # print(*self._m2, sep='\n')
 
     @Slot()
     def slot_measure_beam(self) -> None:
+        if not self._programs:
+            return
         if self._measured_amount > self._measured_amount_max:
             self._timer.stop()
             self._measured_amount = 0
@@ -198,10 +203,17 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
                 )
             )
             result['number'] = self._program_index
-            # result['coordinate'] = self._programs[self._program_index]['coordinate']
+            result['coordinate'] = self._programs[self._program_index]['coordinate']
             self._m2.append(result)
-            print(self._m2)
-
+            print(*[f'{el["coordinate"]}\t{el["number"]}' for el in self._m2], sep='\n')
+            self._program_index += 1
+            if self._program_index == len(self._programs):
+                self._program_index = 0
+            request = self._create_movement_request(
+                self._programs[self._program_index]
+            )
+            
+            self.movement_request_created.emit(request)
             return
         bp = self._parse_beam_parameters(self._communication._current_data)
         self._measured_pars['global_x'].append(bp['global_x'])
@@ -331,7 +343,7 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
             if self._programs:
                 request = self._create_movement_request(self._programs[0])
                 self.movement_request_created.emit(request)
-                self._program_index = 1
+                # self._program_index = 1
             # for d in text_program:
             #     self._programs.append(d)
                 # coordinate = float(d['coordinate'])
@@ -390,26 +402,30 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
         return result
 
     @Slot(str)
-    def slot_move_to_next_point(self, answer):
-        if self._program_index > (len(self._programs) - 1):
-            self._program_index = 0
+    def slot_movement_finished(self, answer):
+        if not self._programs:
+            return
+        # if self._program_index == len(self._programs):
+        #     self._program_index = 0
             # self._programs = []
             # return
-        print(answer[-7:-1])
-        request = self._create_movement_request(
-            self._programs[self._program_index]
-        )
-        data = self._communication._current_data
-        self._m2.append(
-            {
-                'coordinate': self._programs[self._program_index]['coordinate'],
-                'data': data
-            }
-        )
-        print(f'{data = }')
-        self.measuring_requested.emit()
-        self.movement_request_created.emit(request)
-        self._program_index += 1 
+        print(f'Step number:{answer[-7:-1]}')
+        # request = self._create_movement_request(
+        #     self._programs[self._program_index]
+        # )
+        # data = self._communication._current_data
+        # self._m2.append(
+        #     {
+        #         'coordinate': self._programs[self._program_index]['coordinate'],
+        #         'data': data
+        #     }
+        # )
+        # print(f'{data = }')
+        self._communication.adjust_exposure.emit()
+
+        # self.measuring_requested.emit()
+        # self.movement_request_created.emit(request)
+        # self._program_index += 1 
 
     def check_available_comports(self) -> list:
         return [
