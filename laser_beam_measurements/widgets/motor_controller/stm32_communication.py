@@ -1,6 +1,6 @@
 # Current MCU: STM32F103C8T6
-# from enum import StrEnum
-from strenum import StrEnum
+from enum import StrEnum
+# from strenum import StrEnum
 from serial import Serial
 from serial.serialutil import SerialException
 from serial.tools.list_ports import comports

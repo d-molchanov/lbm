@@ -14,8 +14,8 @@ import numpy
 from PySide6.QtCore import Signal, QSettings, Slot, QPointF, QMutexLocker
 from .image_processor_base import ImageProcessorBase
 from .beam_finder import BeamState
-# from enum import StrEnum
-from strenum import StrEnum
+from enum import StrEnum
+# from strenum import StrEnum
 from .utils.denoising import find_noise_level_from_histogram, threshold
 from .utils import beam_width as bm
 from .utils.sub_image import get_cross_section

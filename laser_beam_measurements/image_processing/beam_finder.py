@@ -15,8 +15,8 @@ from .image_processor_base import ImageProcessorBase
 from .utils.sub_image import rotate_sub_image
 from .utils.denoising import threshold
 from .utils.beam_width import width_by_moments
-# from enum import StrEnum
-from strenum import StrEnum
+from enum import StrEnum
+# from strenum import StrEnum
 import cv2
 from math import pi
 from PySide6.QtCore import Signal, Slot, QMutexLocker, QPointF, QSizeF, QSettings
