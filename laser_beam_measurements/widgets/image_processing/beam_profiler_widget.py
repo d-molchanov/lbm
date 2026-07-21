@@ -97,7 +97,8 @@ class BeamProfilerWidget(ImageProcessorViewerBase):
 
         self.curve_line_y = pg.PlotDataItem(name="Y gauss appr")
         self.curve_line_y.setPen(pg.mkPen(color='#000080', width=2))
-        self.ui.cs_plot_y.addItem(self.curve_line_y)
+        # self.ui.cs_plot_y.addItem(self.curve_line_y)
+        self.ui.cs_plot_y.addItem(self.curve_line_x)
 
     def _configure_plots(self):
         _configure_plot(self.ui.cs_plot_x)
@@ -135,7 +136,8 @@ class BeamProfilerWidget(ImageProcessorViewerBase):
 
     @Slot(numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray)
     def show_cross_sections(self, xx: numpy.ndarray, im_x: numpy.ndarray, yy: numpy.ndarray, im_y: numpy.ndarray) -> None:
-        self._update_curves(xx, im_x, yy, im_y)
+        # self._update_curves(xx, im_x, yy, im_y)
+        self._update_curves(xx, im_x, xx, im_x)
 
     def _update_curves(self,
                        xx: numpy.ndarray, curve_x: numpy.ndarray,
