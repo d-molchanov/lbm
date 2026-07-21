@@ -23,7 +23,7 @@ class ROI(QGraphicsObject):
 
     RESIZE_ZONE_SIZE = 40
     MIN_AREA_SIZE = 40
-    MAX_ROTATION_ANGLE = 45
+    MAX_ROTATION_ANGLE = 90
 
     class SelectorZone(Enum):
         NONE = 1
