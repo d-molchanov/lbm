@@ -17,7 +17,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBox,
     QGridLayout, QGroupBox, QHBoxLayout, QHeaderView,
-    QPlainTextEdit, QPushButton, QSizePolicy, QSpacerItem,
+    QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
     QSplitter, QTableWidgetItem, QVBoxLayout, QWidget)
 
 from ..utils.custom_graphics_view import CustomGraphicsView
@@ -53,7 +53,7 @@ class Ui_Form(object):
         self.groupBoxMode.setMinimumSize(QSize(120, 48))
         self.comboBoxMode = QComboBox(self.groupBoxMode)
         self.comboBoxMode.setObjectName(u"comboBoxMode")
-        self.comboBoxMode.setGeometry(QRect(40, 20, 62, 22))
+        self.comboBoxMode.setGeometry(QRect(11, 20, 111, 22))
 
         self.verticalLayout_7.addWidget(self.groupBoxMode)
 
@@ -65,6 +65,7 @@ class Ui_Form(object):
         self.doubleSpinBoxTop = QDoubleSpinBox(self.groupBoxTop)
         self.doubleSpinBoxTop.setObjectName(u"doubleSpinBoxTop")
         self.doubleSpinBoxTop.setGeometry(QRect(10, 20, 88, 24))
+        self.doubleSpinBoxTop.setMaximum(10000.000000000000000)
 
         self.verticalLayout_7.addWidget(self.groupBoxTop)
 
@@ -73,9 +74,10 @@ class Ui_Form(object):
         sizePolicy.setHeightForWidth(self.groupBoxBottom.sizePolicy().hasHeightForWidth())
         self.groupBoxBottom.setSizePolicy(sizePolicy)
         self.groupBoxBottom.setMinimumSize(QSize(120, 48))
-        self.doubleSpinBoxBotton = QDoubleSpinBox(self.groupBoxBottom)
-        self.doubleSpinBoxBotton.setObjectName(u"doubleSpinBoxBotton")
-        self.doubleSpinBoxBotton.setGeometry(QRect(10, 20, 88, 24))
+        self.doubleSpinBoxBottom = QDoubleSpinBox(self.groupBoxBottom)
+        self.doubleSpinBoxBottom.setObjectName(u"doubleSpinBoxBottom")
+        self.doubleSpinBoxBottom.setGeometry(QRect(10, 20, 88, 24))
+        self.doubleSpinBoxBottom.setMaximum(10000.000000000000000)
 
         self.verticalLayout_7.addWidget(self.groupBoxBottom)
 
@@ -84,10 +86,10 @@ class Ui_Form(object):
         sizePolicy.setHeightForWidth(self.groupBoxContrast.sizePolicy().hasHeightForWidth())
         self.groupBoxContrast.setSizePolicy(sizePolicy)
         self.groupBoxContrast.setMinimumSize(QSize(120, 48))
-        self.plainTextEditContrast = QPlainTextEdit(self.groupBoxContrast)
-        self.plainTextEditContrast.setObjectName(u"plainTextEditContrast")
-        self.plainTextEditContrast.setGeometry(QRect(10, 20, 104, 21))
-        self.plainTextEditContrast.setReadOnly(True)
+        self.lineEditContrast = QLineEdit(self.groupBoxContrast)
+        self.lineEditContrast.setObjectName(u"lineEditContrast")
+        self.lineEditContrast.setGeometry(QRect(10, 20, 113, 22))
+        self.lineEditContrast.setReadOnly(True)
 
         self.verticalLayout_7.addWidget(self.groupBoxContrast)
 

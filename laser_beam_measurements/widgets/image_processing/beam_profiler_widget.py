@@ -13,7 +13,7 @@
 
 from laser_beam_measurements.image_processing.image_processor_viewer_base import ImageProcessorViewerBase
 from PySide6.QtCore import Slot, Qt, QSettings
-from PySide6.QtGui import QPen, QFont
+from PySide6.QtGui import QPen, QFont, QColor
 from PySide6.QtWidgets import QTableWidgetItem, QTableWidget
 from .ui_beam_profiler_widget import Ui_Form
 from laser_beam_measurements.image_processing.beam_profiler import BeamProfiler, CROSS_SECTION_AUTO
@@ -61,6 +61,7 @@ class BeamProfilerWidget(ImageProcessorViewerBase):
         self._configure_curves()
         self.table_widget_items: dict[str, QTableWidgetItem | tuple[QTableWidgetItem, QTableWidgetItem]] = dict()
         self._fill_colormap_combobox()
+        self._fill_mode_combobox()
 
         self.ui.show_cross_check_box.toggled.connect(self._slot_show_cross)
         self.ui.auto_cross_check_box.toggled.connect(self._slot_set_cross_auto)
@@ -71,6 +72,26 @@ class BeamProfilerWidget(ImageProcessorViewerBase):
 
     def _connect_signals(self):
         self.ui.selectParametersPushButton.clicked.connect(self._show_parameter_select_widget)
+        self.cursor_x.sigPositionChangeFinished.connect(self.on_cursor_x_position_change_finished)
+        self.cursor_y.sigPositionChangeFinished.connect(self.on_cursor_y_position_change_finished)
+
+    @Slot()
+    def on_cursor_x_position_change_finished(self, line):
+        self.ui.doubleSpinBoxBottom.setValue(line.value())
+        self.ui.lineEditContrast.setText(
+            str(
+                self.ui.doubleSpinBoxTop.value()/self.ui.doubleSpinBoxBottom.value()
+            )
+        )
+
+    @Slot()
+    def on_cursor_y_position_change_finished(self, line):
+        self.ui.doubleSpinBoxTop.setValue(line.value())
+        self.ui.lineEditContrast.setText(
+            str(
+                self.ui.doubleSpinBoxTop.value()/self.ui.doubleSpinBoxBottom.value()
+            )
+        )
 
     @Slot()
     def _show_parameter_select_widget(self) -> None:
@@ -85,6 +106,27 @@ class BeamProfilerWidget(ImageProcessorViewerBase):
         self.curve_x.setSize(4)
         self.ui.cs_plot_x.addItem(self.curve_x)
 
+        label_options = {
+            'position': 0.95,
+            'color': (0, 0, 0),
+            'fill': QColor(255, 255, 255, 255),
+            'border': QColor(0, 0, 0, 255)
+        }
+        self.cursor_x = pg.InfiniteLine(
+            name='Cursor X',
+            pos=0,
+            angle=0,
+            movable=True,
+            label='{value:.2f}',
+            labelOpts=label_options
+
+        )
+        pen = QPen(Qt.GlobalColor.green, 2)
+        pen.setCosmetic(True)
+        self.cursor_x.setPen(pen)
+        self.ui.cs_plot_x.addItem(self.cursor_x)
+        # self.cursor_x.setData([0, 100], [100, 100])
+
         self.curve_line_x = pg.PlotDataItem(name="X gauss appr")
         self.curve_line_x.setPen(pg.mkPen(color='#800000', width=2))
         self.ui.cs_plot_x.addItem(self.curve_line_x)
@@ -94,6 +136,18 @@ class BeamProfilerWidget(ImageProcessorViewerBase):
         self.curve_y.setBrush(pg.mkBrush(color='b'))
         self.curve_y.setSize(4)
         self.ui.cs_plot_y.addItem(self.curve_y)
+
+        self.cursor_y = pg.InfiniteLine(
+            name='Cursor Y',
+            pos=0,
+            angle=0,
+            movable=True,
+            label='{value:.2f}',
+            labelOpts=label_options
+        )
+        self.cursor_y.setPen(pen)
+        # self.cursor_y.setZValue(1000)
+        self.ui.cs_plot_y.addItem(self.cursor_y)
 
         self.curve_line_y = pg.PlotDataItem(name="Y gauss appr")
         self.curve_line_y.setPen(pg.mkPen(color='#000080', width=2))
@@ -105,6 +159,16 @@ class BeamProfilerWidget(ImageProcessorViewerBase):
 
     def _update_parameters(self) -> None:
         pass
+
+    def _fill_mode_combobox(self) -> None:
+        modes = [
+            'X-Y',
+            'Double X',
+            'Double Y'
+        ]
+        for mode in modes:
+            self.ui.comboBoxMode.addItem(mode)
+        self.ui.comboBoxMode.setCurrentText(modes[0])
 
     def _fill_colormap_combobox(self) -> None:
         for name in COLORMAPS.get_names():

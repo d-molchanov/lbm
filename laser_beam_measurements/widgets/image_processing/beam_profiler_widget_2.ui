@@ -47,9 +47,9 @@
             <widget class="QComboBox" name="comboBoxMode">
              <property name="geometry">
               <rect>
-               <x>40</x>
+               <x>11</x>
                <y>20</y>
-               <width>62</width>
+               <width>111</width>
                <height>22</height>
               </rect>
              </property>
@@ -82,6 +82,9 @@
                <height>24</height>
               </rect>
              </property>
+             <property name="maximum">
+              <double>10000.000000000000000</double>
+             </property>
             </widget>
            </widget>
           </item>
@@ -102,7 +105,7 @@
             <property name="title">
              <string>Bottom</string>
             </property>
-            <widget class="QDoubleSpinBox" name="doubleSpinBoxBotton">
+            <widget class="QDoubleSpinBox" name="doubleSpinBoxBottom">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -110,6 +113,9 @@
                <width>88</width>
                <height>24</height>
               </rect>
+             </property>
+             <property name="maximum">
+              <double>10000.000000000000000</double>
              </property>
             </widget>
            </widget>
@@ -131,13 +137,13 @@
             <property name="title">
              <string>Contrast</string>
             </property>
-            <widget class="QPlainTextEdit" name="plainTextEditContrast">
+            <widget class="QLineEdit" name="lineEditContrast">
              <property name="geometry">
               <rect>
                <x>10</x>
                <y>20</y>
-               <width>104</width>
-               <height>21</height>
+               <width>113</width>
+               <height>22</height>
               </rect>
              </property>
              <property name="readOnly">
