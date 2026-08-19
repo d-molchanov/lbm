@@ -15,10 +15,11 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBox,
-    QGridLayout, QGroupBox, QHBoxLayout, QHeaderView,
-    QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
-    QSplitter, QTableWidgetItem, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QCheckBox, QComboBox,
+    QDoubleSpinBox, QGridLayout, QGroupBox, QHBoxLayout,
+    QHeaderView, QLineEdit, QPushButton, QSizePolicy,
+    QSpacerItem, QSplitter, QTableWidgetItem, QVBoxLayout,
+    QWidget)
 
 from ..utils.custom_graphics_view import CustomGraphicsView
 from laser_beam_measurements.widgets.utils.parameters_table_widget import ParametersTableWidget
@@ -67,6 +68,7 @@ class Ui_Form(object):
         self.doubleSpinBoxTop.setGeometry(QRect(10, 20, 88, 24))
         self.doubleSpinBoxTop.setMinimum(-10000.000000000000000)
         self.doubleSpinBoxTop.setMaximum(10000.000000000000000)
+        self.doubleSpinBoxTop.setStepType(QAbstractSpinBox.StepType.AdaptiveDecimalStepType)
 
         self.verticalLayout_7.addWidget(self.groupBoxTop)
 
