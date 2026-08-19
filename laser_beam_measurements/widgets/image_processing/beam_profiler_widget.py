@@ -62,6 +62,7 @@ class BeamProfilerWidget(ImageProcessorViewerBase):
         self.table_widget_items: dict[str, QTableWidgetItem | tuple[QTableWidgetItem, QTableWidgetItem]] = dict()
         self._fill_colormap_combobox()
         self._fill_mode_combobox()
+        
 
         self.ui.show_cross_check_box.toggled.connect(self._slot_show_cross)
         self.ui.auto_cross_check_box.toggled.connect(self._slot_set_cross_auto)
@@ -74,24 +75,37 @@ class BeamProfilerWidget(ImageProcessorViewerBase):
         self.ui.selectParametersPushButton.clicked.connect(self._show_parameter_select_widget)
         self.cursor_x.sigPositionChangeFinished.connect(self.on_cursor_x_position_change_finished)
         self.cursor_y.sigPositionChangeFinished.connect(self.on_cursor_y_position_change_finished)
+        self.ui.comboBoxMode.currentTextChanged.connect(self.on_mode_changed)
+
+    @Slot()
+    def on_mode_changed(self):
+        self._mode = self.ui.comboBoxMode.currentText()
 
     @Slot()
     def on_cursor_x_position_change_finished(self, line):
         self.ui.doubleSpinBoxBottom.setValue(line.value())
-        self.ui.lineEditContrast.setText(
-            str(
-                self.ui.doubleSpinBoxTop.value()/self.ui.doubleSpinBoxBottom.value()
-            )
-        )
+        self._update_contrast()
+
+
+    def _calculate_contrast(self) -> float:
+        cursor_y_value = self.ui.doubleSpinBoxTop.value()
+        cursor_x_value = self.ui.doubleSpinBoxBottom.value()
+        try:
+            return cursor_y_value / cursor_x_value
+        except ZeroDivisionError as e:
+            return None
+
+    def _update_contrast(self) -> None:
+        value = self._calculate_contrast()
+        if value is None:
+            self.ui.lineEditContrast.setText('Inf')
+        else:
+            self.ui.lineEditContrast.setText(f'{value:.4f}')
 
     @Slot()
     def on_cursor_y_position_change_finished(self, line):
         self.ui.doubleSpinBoxTop.setValue(line.value())
-        self.ui.lineEditContrast.setText(
-            str(
-                self.ui.doubleSpinBoxTop.value()/self.ui.doubleSpinBoxBottom.value()
-            )
-        )
+        self._update_contrast()
 
     @Slot()
     def _show_parameter_select_widget(self) -> None:
@@ -169,6 +183,7 @@ class BeamProfilerWidget(ImageProcessorViewerBase):
         for mode in modes:
             self.ui.comboBoxMode.addItem(mode)
         self.ui.comboBoxMode.setCurrentText(modes[0])
+        self._mode = modes[0]
 
     def _fill_colormap_combobox(self) -> None:
         for name in COLORMAPS.get_names():
@@ -204,12 +219,20 @@ class BeamProfilerWidget(ImageProcessorViewerBase):
     def _update_curves(self,
                        xx: numpy.ndarray, curve_x: numpy.ndarray,
                        yy: numpy.ndarray, curve_y: numpy.ndarray) -> None:
-        self.curve_x.setData(x=xx, y=curve_x)
-        self.curve_y.setData(x=yy, y=curve_y)
+        if self._mode == 'Double X':
+            self.curve_x.setData(x=xx, y=curve_x)
+            self.curve_y.setData(x=xx, y=curve_x)
+        elif self._mode == 'Double Y':
+            self.curve_x.setData(x=yy, y=curve_y)
+            self.curve_y.setData(x=yy, y=curve_y)
+        else:
+            self.curve_x.setData(x=xx, y=curve_x)
+            self.curve_y.setData(x=yy, y=curve_y)
 
     @Slot(numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray)
     def show_gauss_approximation(self, xx, model_x, yy, model_y):
-        self._update_apr_curves(xx, model_x, yy, model_y)
+        # self._update_apr_curves(xx, model_x, yy, model_y)
+        pass
 
     def _update_apr_curves(self,
                            xx: numpy.ndarray, curve_x: numpy.ndarray,

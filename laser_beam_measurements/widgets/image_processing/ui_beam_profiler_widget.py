@@ -65,6 +65,7 @@ class Ui_Form(object):
         self.doubleSpinBoxTop = QDoubleSpinBox(self.groupBoxTop)
         self.doubleSpinBoxTop.setObjectName(u"doubleSpinBoxTop")
         self.doubleSpinBoxTop.setGeometry(QRect(10, 20, 88, 24))
+        self.doubleSpinBoxTop.setMinimum(-10000.000000000000000)
         self.doubleSpinBoxTop.setMaximum(10000.000000000000000)
 
         self.verticalLayout_7.addWidget(self.groupBoxTop)
@@ -77,6 +78,7 @@ class Ui_Form(object):
         self.doubleSpinBoxBottom = QDoubleSpinBox(self.groupBoxBottom)
         self.doubleSpinBoxBottom.setObjectName(u"doubleSpinBoxBottom")
         self.doubleSpinBoxBottom.setGeometry(QRect(10, 20, 88, 24))
+        self.doubleSpinBoxBottom.setMinimum(-10000.000000000000000)
         self.doubleSpinBoxBottom.setMaximum(10000.000000000000000)
 
         self.verticalLayout_7.addWidget(self.groupBoxBottom)

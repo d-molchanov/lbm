@@ -82,6 +82,9 @@
                <height>24</height>
               </rect>
              </property>
+             <property name="minimum">
+              <double>-10000.000000000000000</double>
+             </property>
              <property name="maximum">
               <double>10000.000000000000000</double>
              </property>
@@ -113,6 +116,9 @@
                <width>88</width>
                <height>24</height>
               </rect>
+             </property>
+             <property name="minimum">
+              <double>-10000.000000000000000</double>
              </property>
              <property name="maximum">
               <double>10000.000000000000000</double>
