@@ -106,7 +106,7 @@ class BeamProfiler(ImageProcessorBase):
         noise_level = find_noise_level_from_histogram(image)
         denoised_image = threshold(image, noise_level)
 
-        ps = self._pixel_size
+        ps = self._pixel_size / 1e6
 
         width_group = self._bp.width
         four_sigma = width_group.four_sigma()

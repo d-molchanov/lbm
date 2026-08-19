@@ -33,7 +33,7 @@ def _configure_plot(plot_widget: pg.PlotWidget) -> None:
     plot_widget.setBackground("w")
     plot_widget.setYRange(0, 250)
     plot_widget.setLabel("left", "Intensity", "a.u.", **styles)
-    plot_widget.setLabel("bottom", "Dimension", "mkm", **styles)
+    plot_widget.setLabel("bottom", "Dimension", "m", **styles)
     plot_widget.showGrid(x=True, y=True)
     plot_widget.addLegend(offset=(1, 1), labelTextColor=[0, 0, 0], labelTextSize='8pt')
 
