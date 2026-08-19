@@ -180,6 +180,8 @@ class BeamProfilerWidget(ImageProcessorViewerBase):
         self.curve_line_y.setPen(pg.mkPen(color='#000080', width=2))
         self.ui.cs_plot_y.addItem(self.curve_line_y)
 
+        self._first: bool = True
+
     def _configure_plots(self):
         _configure_plot(self.ui.cs_plot_x)
         _configure_plot(self.ui.cs_plot_y)
@@ -232,6 +234,15 @@ class BeamProfilerWidget(ImageProcessorViewerBase):
     def _update_curves(self,
                        xx: numpy.ndarray, curve_x: numpy.ndarray,
                        yy: numpy.ndarray, curve_y: numpy.ndarray) -> None:
+        if self._first:
+            max_value: int = 250
+            dtype = curve_x.dtype
+            if dtype == numpy.uint16:
+                max_value = 4000
+            # max_value = max(curve_x.max(), curve_y.max())
+            self.ui.cs_plot_x.setYRange(0, max_value)
+            self.ui.cs_plot_y.setYRange(0, max_value)
+            self._first = False
         if self._mode == 'Double X':
             self.curve_x.setData(x=xx, y=curve_x)
             self.curve_y.setData(x=xx, y=curve_x)
