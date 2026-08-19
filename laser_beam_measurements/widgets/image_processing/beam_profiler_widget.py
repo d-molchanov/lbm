@@ -12,7 +12,7 @@
 
 
 from laser_beam_measurements.image_processing.image_processor_viewer_base import ImageProcessorViewerBase
-from PySide6.QtCore import Slot, Qt, QSettings
+from PySide6.QtCore import Slot, Qt, QSettings, QSignalBlocker
 from PySide6.QtGui import QPen, QFont, QColor
 from PySide6.QtWidgets import QTableWidgetItem, QTableWidget
 from .ui_beam_profiler_widget import Ui_Form
@@ -76,6 +76,18 @@ class BeamProfilerWidget(ImageProcessorViewerBase):
         self.cursor_x.sigPositionChangeFinished.connect(self.on_cursor_x_position_change_finished)
         self.cursor_y.sigPositionChangeFinished.connect(self.on_cursor_y_position_change_finished)
         self.ui.comboBoxMode.currentTextChanged.connect(self.on_mode_changed)
+        self.ui.doubleSpinBoxTop.valueChanged.connect(self._on_doubleSpinBoxTop_value_changed)
+        self.ui.doubleSpinBoxBottom.valueChanged.connect(self._on_doubleSpinBoxBottom_value_changed)
+
+    @Slot(float)
+    def _on_doubleSpinBoxTop_value_changed(self, value):
+        self.cursor_y.setPos(value)
+        self._update_contrast()
+
+    @Slot(float)
+    def _on_doubleSpinBoxBottom_value_changed(self, value):
+        self.cursor_x.setPos(value)
+        self._update_contrast()
 
     @Slot()
     def on_mode_changed(self):
@@ -136,6 +148,7 @@ class BeamProfilerWidget(ImageProcessorViewerBase):
 
         )
         pen = QPen(Qt.GlobalColor.green, 2)
+        # pen = QPen(Qt.GlobalColor.black, 2)
         pen.setCosmetic(True)
         self.cursor_x.setPen(pen)
         self.ui.cs_plot_x.addItem(self.cursor_x)

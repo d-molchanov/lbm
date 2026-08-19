@@ -82,6 +82,7 @@ class Ui_Form(object):
         self.doubleSpinBoxBottom.setGeometry(QRect(10, 20, 88, 24))
         self.doubleSpinBoxBottom.setMinimum(-10000.000000000000000)
         self.doubleSpinBoxBottom.setMaximum(10000.000000000000000)
+        self.doubleSpinBoxBottom.setStepType(QAbstractSpinBox.StepType.AdaptiveDecimalStepType)
 
         self.verticalLayout_7.addWidget(self.groupBoxBottom)
 
