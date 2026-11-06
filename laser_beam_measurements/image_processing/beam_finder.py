@@ -52,10 +52,10 @@ class BeamFinder(ImageProcessorBase):
         self._position: tuple[float, float] = (0.0, 0.0)
         self._rotation_angle: float = 0.0
         self._scale_factor: float = 1.0
-        self._noise_level: float = 0.0
+        self._noise_level: float = 45.0
 
         self._flag_find_auto: bool = True
-        self._flag_delete_noise: bool = False
+        self._flag_delete_noise: bool = True
         self._flag_rotation_enable: bool = False
         self._flag_manual_rotation: bool = False
 

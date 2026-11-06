@@ -166,7 +166,8 @@ class CameraPropertyControllerWidget(QWidget):
         self.signal_camera_property_changed.emit("gain", value)
 
     def _fill_camera_info(self, info: dict) -> None:
-        self.ui.camera_info.setItem(0, 0, QTableWidgetItem(info['type']))
+        # self.ui.camera_info.setItem(0, 0, QTableWidgetItem(info['type']))
+        self.ui.camera_info.setItem(0, 0, QTableWidgetItem(''))
         self.ui.camera_info.setItem(1, 0, QTableWidgetItem(info['id']))
         if isinstance(info['resolution'], (list, tuple)):
             matrix_shape = '{}x{} pixels'.format(info['resolution'][0], info['resolution'][1])

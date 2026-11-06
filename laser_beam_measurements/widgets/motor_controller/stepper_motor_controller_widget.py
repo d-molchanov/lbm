@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from time import perf_counter
 from typing import Optional
 from serial import Serial
 from serial.tools.list_ports import comports
@@ -91,7 +91,26 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
         )
         # self.ui.textEditProgram.setPlainText('10 mm +\n-20 mm +\n5 mm -\n5 mm +')
         # self.ui.textEditProgram.setPlainText('10 mm +\n10 mm +\n10 mm +\n10 mm +\n10 mm +\n-50 mm +')
-        self.ui.textEditProgram.setPlainText('10 mm +\n-10 mm +')
+        # self.ui.textEditProgram.setPlainText('10 mm +\n-10 mm +')
+        self.ui.textEditProgram.setPlainText(
+            '\n'.join(
+                [
+                    '-120 mm -',
+                    '52 mm -',
+                    '-1 mm -',
+                    '-5 mm +',
+                    '-5 mm +',
+                    '-5 mm +',
+                    '-5 mm +',
+                    '-5 mm +',
+                    '-5 mm +',
+                    '-5 mm +',
+                    '-5 mm +',
+                    '-5 mm +',
+                    '-5 mm +'
+                ]
+            )
+        )
         # self.logs_updated.emit('hello!')
         self._programs = []
         self._program_index = 0
@@ -115,6 +134,8 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
             'gauss_y': [],
             'power86': []
         }
+        self._delay = perf_counter()
+        self.ui.tabWidget.setCurrentIndex(2)
 
     @property
     def stm32_communication(self) -> Optional[STM32Communication]:
@@ -151,7 +172,8 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
             self._communication.check_state
         )
         self.ui.pushButtonStopMotor.clicked.connect(
-            self._communication.stop_motor
+            # self._communication.stop_motor
+            self.stop_program
         )
         self.ui.pushButtonSetZero.clicked.connect(
             self._communication.set_zero
@@ -174,6 +196,11 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
         # self.measuring_requested.connect(self._communication.slot_measure_beams)
         self._communication.measure_beams.connect(self.on_measuring_requested)
         # print('Signals were set.')
+    Slot()
+    def stop_program(self):
+        self._communication.stop_motor()
+        self._programs = []
+        self._program_index = 0
 
     @Slot()
     def on_measuring_requested(self):
@@ -291,7 +318,7 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
 
 
     def create_request(self) -> dict:
-        self.update_logs(f'{self.ui.tabWidget.currentIndex() = }')
+        # self.update_logs(f'{self.ui.tabWidget.currentIndex() = }')
         if self.ui.tabWidget.currentIndex() == 0:
             result = {
                 'request_type': 'Movement',
@@ -339,7 +366,7 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
             self._programs = self._parse_program(
                 self.ui.textEditProgram.toPlainText()
             )
-            self.update_logs(f'{self._programs = }')
+            # self.update_logs(f'{self._programs = }')
             if self._programs:
                 request = self._create_movement_request(self._programs[0])
                 self.movement_request_created.emit(request)
@@ -403,6 +430,23 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
 
     @Slot(str)
     def slot_movement_finished(self, answer):
+        print(f'`{answer}`')
+        if answer[1] == 'X':
+            ts = perf_counter()
+            print(ts - self._delay)
+            self._communication.set_zero()
+        # if answer[1] == 
+        if answer[1] == 'Z':
+            # if not self._programs: 
+            #     return
+            # self._program_index += 1
+            # if self._program_index == len(self._programs):
+            #     self._program_index = 0
+            # request = self._create_movement_request(
+            #     self._programs[self._program_index]
+            # )
+            # self.movement_request_created.emit(request)
+            return 
         if not self._programs:
             return
         # if self._program_index == len(self._programs):
@@ -421,8 +465,18 @@ class StepperMotorControllerWidget(QWidget, Ui_Form):
         #     }
         # )
         # print(f'{data = }')
-        self._communication.adjust_exposure.emit()
-
+        print(self._programs, self._program_index)
+        if self._programs[self._program_index]['command'] == '+':
+            self._communication.adjust_exposure.emit()
+        else:
+            self._program_index += 1
+            if self._program_index == len(self._programs):
+                self._program_index = 0
+            request = self._create_movement_request(
+                self._programs[self._program_index]
+            )
+            
+            self.movement_request_created.emit(request)
         # self.measuring_requested.emit()
         # self.movement_request_created.emit(request)
         # self._program_index += 1 

@@ -39,6 +39,11 @@ class BeamFinderWidget(ImageProcessorViewerBase):
         self._fill_colormap_combobox()
 
     def _configure_roi_controls(self):
+        
+        # self.ui.noise_group_box.setChecked(True)
+        # print(self.ui.noise_group_box.isChecked())
+        # self.ui.noise_value_spin_box.setValue(45.0)
+        # print(self.ui.noise_value_spin_box.value())
         self.ui.roi_x.set_label_text('X:')
         self.ui.roi_y.set_label_text('Y:')
         self.ui.roi_w.set_label_text('Width:')

@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'beam_finder_widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.0
+## Created by: Qt User Interface Compiler version 6.11.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -160,6 +160,7 @@ class Ui_Form(object):
         self.noise_value_spin_box.setDecimals(1)
         self.noise_value_spin_box.setMinimum(-45.000000000000000)
         self.noise_value_spin_box.setMaximum(45.000000000000000)
+        self.noise_value_spin_box.setValue(45.000000000000000)
 
         self.verticalLayout.addWidget(self.noise_group_box)
 
